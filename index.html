@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>十二年國教 英語文領域課程綱要 智慧互動查詢檢索系統 (108課綱)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* 自訂滾動條 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- 頂部導航列 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-4">
+        <!-- 系統標題 -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-sm shrink-0">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-none">108課綱 英語文領域</h1>
+              <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-semibold border border-indigo-200">教育部正式版</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">國民中小學暨普通型高級中等學校 互動式課綱檢索系統</p>
+          </div>
+        </div>
+
+        <!-- 全域快速搜尋欄 -->
+        <div class="flex-1 max-w-lg hidden md:block relative">
+          <div class="relative">
+            <input type="text" id="global-search-input" placeholder="全網即時搜尋：輸入代碼(1-Ⅳ-7)、關鍵字(完成式、性平、廣播、airport)... 按 / 聚焦" 
+              class="w-full pl-9 pr-10 py-1.5 text-xs bg-slate-100 hover:bg-slate-200/70 focus:bg-white border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 rounded-lg outline-none transition-all">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 border border-slate-300 rounded px-1.5 py-0.5 bg-white font-mono">/</span>
+          </div>
+        </div>
+
+        <!-- 右側教案自選清單按鈕 -->
+        <div class="flex items-center gap-2">
+          <button onclick="openPlanDrawer()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-semibold transition-all">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span>教案自選籃</span>
+            <span id="plan-count-badge" class="inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-gray-600 bg-gray-200 rounded-full">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 行動版搜尋欄 -->
+      <div class="py-2 md:hidden">
+        <input type="text" placeholder="搜尋代碼、指標、單字、文法、議題..." oninput="performGlobalSearch(this.value)"
+          class="w-full px-3 py-1.5 text-xs bg-slate-100 border border-slate-300 rounded-lg outline-none">
+      </div>
+
+      <!-- 頁籤導覽列 (Tabs) -->
+      <div class="flex space-x-1 overflow-x-auto border-t border-slate-200 no-scrollbar py-1">
+        <button onclick="switchTab('explorer')" class="nav-tab-btn px-4 py-2 text-sm font-bold text-indigo-700 border-b-2 border-indigo-600 whitespace-nowrap bg-indigo-50/50 flex items-center gap-1.5" data-tab="explorer">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          學習重點檢索
+        </button>
+        <button onclick="switchTab('competencies')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="competencies">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+          核心素養 (三面九項)
+        </button>
+        <button onclick="switchTab('vocabulary')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="vocabulary">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+          2,000字 參考字彙庫
+        </button>
+        <button onclick="switchTab('grammar')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="grammar">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+          國中文法句構寶典
+        </button>
+        <button onclick="switchTab('issues')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="issues">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          19項議題融入對應
+        </button>
+        <button onclick="switchTab('electives')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="electives">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
+          普高加深加廣選修
+        </button>
+        <button onclick="switchTab('functions')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="functions">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+          主題體裁與溝通功能
+        </button>
+        <button onclick="switchTab('guidelines')" class="nav-tab-btn px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 border-b-2 border-transparent whitespace-nowrap flex items-center gap-1.5" data-tab="guidelines">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          實施要點與學分
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 全域搜尋結果浮動彈窗 (Modal Overlay) -->
+  <div id="global-search-results-modal" class="hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-xs flex items-start justify-center pt-20 px-4">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+          <h3 id="search-result-count" class="text-sm font-bold text-slate-800">搜尋結果</h3>
+        </div>
+        <button onclick="performGlobalSearch('')" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div id="search-result-list" class="p-6 overflow-y-auto flex-1">
+        <!-- 搜尋內容動態填充 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 主要內容區 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- TAB 1: 學習重點檢索 (Explorer) -->
+    <section id="tab-content-explorer" class="space-y-6">
+      <!-- 篩選控制列 -->
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- 表現 vs 內容 切換 -->
+            <select id="explorer-type-toggle" class="text-xs font-bold px-3 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg outline-none cursor-pointer">
+              <option value="performances">學習表現 (Performance)</option>
+              <option value="contents">學習內容 (Content)</option>
+            </select>
+
+            <!-- 學習階段篩選 -->
+            <select id="explorer-stage-select" class="text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
+              <option value="ALL">全部學習階段 (II~V)</option>
+              <option value="II">第二階段 (國小 3-4年級)</option>
+              <option value="III">第三階段 (國小 5-6年級)</option>
+              <option value="IV">第四階段 (國中 7-9年級)</option>
+              <option value="V">第五階段 (普通型高中 10-12年級)</option>
+            </select>
+
+            <!-- 類別或主題篩選 -->
+            <select id="explorer-category-select" class="text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
+              <!-- 動態由 JavaScript 填入 -->
+            </select>
+
+            <!-- 標籤篩選 -->
+            <select id="explorer-tag-select" class="text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
+              <option value="ALL">全部指標標籤</option>
+              <option value="spiral">◎ 螺旋向上 (跨階段重複)</option>
+              <option value="advanced">★ 較高階 (適性/加深加廣)</option>
+            </select>
+          </div>
+
+          <span id="explorer-count-badge" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+            載入中...
+          </span>
+        </div>
+
+        <!-- 關鍵字搜尋條 -->
+        <div>
+          <input type="text" id="explorer-search-input" placeholder="在學習重點中快速搜尋：輸入代碼 (例: 1-Ⅳ-7, Ad-Ⅲ-2) 或指標文字..." 
+            class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-lg outline-none">
+        </div>
+      </div>
+
+      <!-- 說明圖例小工具列 -->
+      <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600 bg-slate-100/70 px-4 py-2 rounded-lg">
+        <span class="font-bold text-slate-700">指標代碼圖例：</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> 第二階段(國小三四)</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-500"></span> 第三階段(國小五六)</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 第四階段(國中七至九)</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-500"></span> 第五階段(普高十至十二)</span>
+        <span class="ml-auto inline-flex items-center gap-2">
+          <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded font-mono font-bold">◎ 螺旋向上</span>
+          <span class="bg-amber-100 text-amber-800 border border-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">★ 較高階</span>
+        </span>
+      </div>
+
+      <!-- 指標卡片清單網格 -->
+      <div id="explorer-items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 2: 核心素養 (Competencies) -->
+    <section id="tab-content-competencies" class="hidden space-y-6">
+      <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-xs">
+        <div class="max-w-3xl">
+          <h2 class="text-lg font-bold text-slate-900">肆、英語文核心素養 (三面九項) 具體內涵對照</h2>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            依循總綱「自主行動 (A)」、「溝通互動 (B)」、「社會參與 (C)」三大面向與九大項目，在國民小學教育 (E)、國民中學教育 (J)、普通型高級中等學校教育 (S-U) 之具體展現。
+          </p>
+        </div>
+      </div>
+
+      <div id="competencies-cards-container" class="space-y-4">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 3: 2,000字 參考字彙庫 (Vocabulary) -->
+    <section id="tab-content-vocabulary" class="hidden space-y-6">
+      <!-- 控制列 -->
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- 分級過濾 -->
+            <select id="vocab-type-select" class="text-xs font-bold px-3 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg outline-none cursor-pointer">
+              <option value="ALL">全部 2,000 字彙</option>
+              <option value="1200">基本 1,200 字 (國中小常用必學)</option>
+              <option value="800">其他常用 800 字 (進階延伸)</option>
+            </select>
+
+            <!-- 37 主題分類過濾 -->
+            <select id="vocab-category-select" class="text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none cursor-pointer">
+              <!-- JS 填充 -->
+            </select>
+
+            <!-- 收藏星號篩選 -->
+            <button id="vocab-fav-filter-btn" onclick="toggleVocabFavoritesOnly()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-1 transition-colors">
+              <svg class="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              我的收藏單字
+            </button>
+          </div>
+
+          <span id="vocab-count-badge" class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+            載入中...
+          </span>
+        </div>
+
+        <!-- 字母 A-Z 快速跳轉索引條 -->
+        <div class="flex flex-wrap gap-1 items-center pt-1 border-t border-slate-100" id="vocab-alphabet-bar">
+          <button onclick="selectVocabLetter('ALL')" class="vocab-letter-btn px-2.5 py-1 text-xs font-bold bg-indigo-600 text-white rounded transition-colors" data-letter="ALL">ALL</button>
+          <button onclick="selectVocabLetter('A')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="A">A</button>
+          <button onclick="selectVocabLetter('B')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="B">B</button>
+          <button onclick="selectVocabLetter('C')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="C">C</button>
+          <button onclick="selectVocabLetter('D')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="D">D</button>
+          <button onclick="selectVocabLetter('E')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="E">E</button>
+          <button onclick="selectVocabLetter('F')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="F">F</button>
+          <button onclick="selectVocabLetter('G')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="G">G</button>
+          <button onclick="selectVocabLetter('H')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="H">H</button>
+          <button onclick="selectVocabLetter('I')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="I">I</button>
+          <button onclick="selectVocabLetter('J')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="J">J</button>
+          <button onclick="selectVocabLetter('K')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="K">K</button>
+          <button onclick="selectVocabLetter('L')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="L">L</button>
+          <button onclick="selectVocabLetter('M')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="M">M</button>
+          <button onclick="selectVocabLetter('N')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="N">N</button>
+          <button onclick="selectVocabLetter('O')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="O">O</button>
+          <button onclick="selectVocabLetter('P')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="P">P</button>
+          <button onclick="selectVocabLetter('Q')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="Q">Q</button>
+          <button onclick="selectVocabLetter('R')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="R">R</button>
+          <button onclick="selectVocabLetter('S')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="S">S</button>
+          <button onclick="selectVocabLetter('T')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="T">T</button>
+          <button onclick="selectVocabLetter('U')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="U">U</button>
+          <button onclick="selectVocabLetter('V')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="V">V</button>
+          <button onclick="selectVocabLetter('W')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="W">W</button>
+          <button onclick="selectVocabLetter('Y')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="Y">Y</button>
+          <button onclick="selectVocabLetter('Z')" class="vocab-letter-btn px-2 py-1 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded transition-colors" data-letter="Z">Z</button>
+        </div>
+
+        <!-- 即時搜尋 -->
+        <div>
+          <input type="text" id="vocab-search-input" placeholder="即時拼音查詢單字：輸入單字拼寫 (如: apple, weather, hospital)..." 
+            class="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-lg outline-none">
+        </div>
+      </div>
+
+      <!-- 單字卡片列表 -->
+      <div id="vocab-items-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 4: 國中文法句構 (Grammar) -->
+    <section id="tab-content-grammar" class="hidden space-y-6">
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">附錄六：國民中學英語文基礎文法句構參考表</h2>
+            <p class="text-xs text-slate-500 mt-0.5">涵蓋詞類、動詞變化、特殊動詞、句構分類、時態、子句與常用句型</p>
+          </div>
+          <div class="w-full sm:w-72">
+            <input type="text" id="grammar-search-input" placeholder="搜尋文法項目 (如: 完成式, 使役, 被動, 子句)..." 
+              class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white">
+          </div>
+        </div>
+      </div>
+
+      <div id="grammar-items-container" class="space-y-4">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 5: 19項議題融入 (Issues) -->
+    <section id="tab-content-issues" class="hidden space-y-6">
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-xs space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">附錄二：十九項重大議題適切融入領域課程綱要</h2>
+            <p class="text-xs text-slate-500 mt-0.5">完整十九項議題學習目標，以及性別平等、人權、環境、海洋四大議題實質內涵與融入示例</p>
+          </div>
+          <div class="w-full sm:w-72">
+            <input type="text" id="issues-search-input" placeholder="搜尋議題或實質內涵代碼 (如: 性平, 人 J1, 海洋, 永續)..." 
+              class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white">
+          </div>
+        </div>
+      </div>
+
+      <div id="issues-list-container">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 6: 普高加深加廣選修 (Electives) -->
+    <section id="tab-content-electives" class="hidden space-y-6">
+      <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-xs">
+        <h2 class="text-base font-bold text-slate-900">普通型高級中等學校 加深加廣選修課程規劃</h2>
+        <p class="text-xs text-slate-500 mt-0.5">普通型高中英語文加深加廣選修共 6 學分，包含三門重點課程，高一至高三皆適用，銜接大學與生涯深化。</p>
+      </div>
+
+      <div id="electives-container">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 7: 主題體裁與溝通功能 (Functions & Themes) -->
+    <section id="tab-content-functions" class="hidden space-y-6">
+      <div id="functions-container">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+
+    <!-- TAB 8: 實施要點與學分 (Guidelines) -->
+    <section id="tab-content-guidelines" class="hidden space-y-6">
+      <div id="guidelines-container">
+        <!-- JS 動態生成 -->
+      </div>
+    </section>
+  </main>
+
+  <!-- 側邊滑出抽屜：教案自選籃 (Lesson Plan Builder Drawer) -->
+  <div id="plan-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-2xl border-l border-slate-200 transform translate-x-full transition-transform duration-200 ease-in-out flex flex-col">
+    <!-- 頂部 -->
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        <h3 class="text-sm font-bold text-slate-900">我的教案設計指標籃</h3>
+      </div>
+      <button onclick="closePlanDrawer()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <!-- 項目清單 -->
+    <div id="plan-drawer-items" class="p-4 overflow-y-auto flex-1 space-y-2.5">
+      <!-- 動態填充 -->
+    </div>
+
+    <!-- 底部操作按鈕 -->
+    <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="exportPlanMarkdown()" class="w-full py-2 px-3 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-1.5 shadow-xs transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          複製 Markdown
+        </button>
+        <button onclick="printPlanWindow()" class="w-full py-2 px-3 text-xs font-bold rounded-lg bg-slate-800 hover:bg-slate-900 text-white flex items-center justify-center gap-1.5 shadow-xs transition-colors">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+          友善列印表格
+        </button>
+      </div>
+      <button onclick="clearAllPlanItems()" class="w-full py-1.5 text-xs text-slate-500 hover:text-red-600 font-medium transition-colors">
+        清空目前選單
+      </button>
+    </div>
+  </div>
+
+  <!-- 頁腳 -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 space-y-2">
+      <p class="font-medium text-slate-700">十二年國民基本教育課程綱要 國民中小學暨普通型高級中等學校 語文領域-英語文</p>
+      <p>資料來源：教育部 107 年 4 月發布課綱標準文件 | 涵蓋基本理念、核心素養、學習重點、加深加廣選修、六大附錄與實施要點</p>
+      <p class="text-slate-400">© 本系統為教師備課、教學設計、課程研究與自主學習打造之現代互動工具</p>
+    </div>
+  </footer>
+
+  <!-- 載入資料庫與主控制器 -->
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
